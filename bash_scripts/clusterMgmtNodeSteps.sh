@@ -22,3 +22,5 @@ sudo scripts/mysql_install_db --no-defaults --datadir=/opt/mysqlcluster/deploy/m
 
 sudo /opt/mysqlcluster/home/mysqlc/bin/ndb_mgmd -f /opt/mysqlcluster/deploy/conf/config.ini --initial --configdir=/opt/mysqlcluster/deploy/conf/
 
+sudo apt install screen -y
+sudo /usr/bin/screen -dm /opt/mysqlcluster/home/mysqlc/bin/mysqld --defaults-file=/opt/mysqlcluster/deploy/conf/my.cnf --user=root

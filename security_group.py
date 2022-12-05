@@ -55,6 +55,14 @@ def add_inbound_rules(ec2, security_group_id):
     }, {
         'IpProtocol': 'tcp', 'FromPort': 22, 'ToPort': 22,
         'IpRanges': [{'CidrIp': '0.0.0.0/0'}]
+    },
+    {
+        'IpProtocol': 'tcp', 'FromPort': 1186, 'ToPort': 1186,
+        'IpRanges': [{'CidrIp': '0.0.0.0/0'}]
+    },
+    {
+        'IpProtocol': 'tcp', 'FromPort': 3306, 'ToPort': 3306,
+        'IpRanges': [{'CidrIp': '0.0.0.0/0'}]
     }]
 
     ec2.authorize_security_group_ingress(
