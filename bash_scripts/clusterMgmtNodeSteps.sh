@@ -13,6 +13,7 @@ echo "
 ndbcluster
 datadir=/opt/mysqlcluster/deploy/mysqld_data
 basedir=/opt/mysqlcluster/home/mysqlc
+bind-address=0.0.0.0
 port=3306" | sudo tee my.cnf
 
 sudo mv ~/config.ini config.ini

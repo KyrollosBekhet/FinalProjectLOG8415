@@ -11,7 +11,7 @@ def create_key_pair(ec2_client, key_name):
     return ec2_client.create_key_pair(KeyName=key_name)
 
 
-def create_instances(ec2_resource, image_id, instance_type, key_name, tags, count, security_group_id):
+def create_instances(ec2_resource, image_id, instance_type, key_name, tags, subnet, count, security_group_id):
     tag_spec = [
         {
             'ResourceType': 'instance',
@@ -29,7 +29,7 @@ def create_instances(ec2_resource, image_id, instance_type, key_name, tags, coun
     instance_params = {
         'ImageId': image_id, 'InstanceType': instance_type,
         'KeyName': key_name, 'SecurityGroupIds': [security_group_id],
-        'TagSpecifications': tag_spec, 'Monitoring': monitoring
+        'SubnetId': subnet, 'TagSpecifications': tag_spec, 'Monitoring': monitoring
     }
     instances = ec2_resource.create_instances(**instance_params, MinCount=count, MaxCount=count)
 

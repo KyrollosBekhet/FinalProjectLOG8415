@@ -12,6 +12,12 @@ ec2_resource = session.resource('ec2')
 vpcs = ec2_client.describe_vpcs()
 vpc_id = vpcs.get('Vpcs', [{}])[0].get('VpcId', '')
 
+sn_all = ec2_client.describe_subnets()
+subnets = []
+for sn in sn_all['Subnets']:
+    if sn['AvailabilityZone'] == 'us-east-1d':
+        subnets.append(sn['SubnetId'])
+
 instance_ami = 'ami-08c40ec9ead489470'
 #key_pair = ec2_client.describe_key_pairs()['KeyPairs'][0]
 key_pair = create_key_pair(ec2_client, "projectKey")
@@ -21,9 +27,9 @@ instances = []
 
 try:
     folder_path = os.path.abspath("bash_scripts")
-    
+
     # do the steps for the standalone version
-    instance = create_instances(ec2_resource, instance_ami, "t2.micro", key_pair["KeyName"], "standalone_instance", 1,
+    instance = create_instances(ec2_resource, instance_ami, "t2.micro", key_pair["KeyName"], "standalone_instance", subnets[0], 1,
                                 security_group_id)[0]
     instance.wait_until_running()
     print(instance.id)
@@ -44,16 +50,16 @@ try:
     run_commands(standalone_connection, commands)
     get_file_from_remote(standalone_connection, "benchmark_results_standalone.txt")
     close_connection(standalone_connection)
-    
+
     #cluster benchmarking
-    master_node_instance = create_instances(ec2_resource, instance_ami, "t2.micro", key_pair["KeyName"], "master_node", 1,
+    master_node_instance = create_instances(ec2_resource, instance_ami, "t2.micro", key_pair["KeyName"], "master_node", subnets[0], 1,
                                 security_group_id)[0]
     master_node_instance.wait_until_running()
     master_node_instance = ec2_resource.Instance(master_node_instance.id)
     instances.append(master_node_instance)
 
     cluster_slaves = []
-    slave_nodes = create_instances(ec2_resource, instance_ami, "t2.micro", key_pair["KeyName"], "slave_node", 3,
+    slave_nodes = create_instances(ec2_resource, instance_ami, "t2.micro", key_pair["KeyName"], "slave_node", subnets[0], 3,
                                 security_group_id)
     for node in slave_nodes:
         node.wait_until_running()
