@@ -24,7 +24,6 @@ def write_file_content(mgmt_node_hs, first_slave_hs, second_slave_hs, third_slav
           + "[ndbd default]\n" \
           + "noofreplicas=3\n" \
           + "datadir=/opt/mysqlcluster/deploy/ndb_data\n" \
-          + "ServerPort=11860\n" \
           + "[ndbd]\n" \
           + "hostname={}\n".format(first_slave_hs) \
           + "nodeid=3\n" \

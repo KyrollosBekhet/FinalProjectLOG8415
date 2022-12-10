@@ -4,6 +4,7 @@ from security_group import *
 from ssh_connection import *
 from config_file_writter import *
 import os
+from proxy_files_generator import *
 
 session = boto3.Session(profile_name='default')
 ec2_client = session.client('ec2')
@@ -22,12 +23,13 @@ instance_ami = 'ami-08c40ec9ead489470'
 #key_pair = ec2_client.describe_key_pairs()['KeyPairs'][0]
 key_pair = create_key_pair(ec2_client, "projectKey")
 key_material = key_pair["KeyMaterial"]
+generate_pem_file(key_material)
 security_group_id = create_security_group(ec2_client, vpc_id)['GroupId']
 instances = []
 
 try:
     folder_path = os.path.abspath("bash_scripts")
-
+    
     # do the steps for the standalone version
     instance = create_instances(ec2_resource, instance_ami, "t2.micro", key_pair["KeyName"], "standalone_instance", subnets[0], 1,
                                 security_group_id)[0]
@@ -68,6 +70,9 @@ try:
         cluster_slaves.append(ins)
 
     write_file_content(master_node_instance.private_dns_name, cluster_slaves[0].private_dns_name,
+        cluster_slaves[1].private_dns_name, cluster_slaves[2].private_dns_name)
+
+    generate_dns_file(master_node_instance.private_dns_name, cluster_slaves[0].private_dns_name,
         cluster_slaves[1].private_dns_name, cluster_slaves[2].private_dns_name)
 
     time.sleep(60)
@@ -122,6 +127,7 @@ except Exception as e:
     print(e)
 
 finally:
+    """
     if len(instances) > 0:
         for instance in instances:
             instance.terminate()
@@ -129,3 +135,4 @@ finally:
 
     ec2_client.delete_key_pair(KeyName="projectKey")
     delete_security_group(ec2_client, security_group_id)
+    """
