@@ -60,6 +60,12 @@ try:
     master_node_instance = ec2_resource.Instance(master_node_instance.id)
     instances.append(master_node_instance)
 
+    proxy_server = create_instances(ec2_resource, instance_ami, "t2.large", key_pair["KeyName"], "proxy_server", subnets[0], 1,
+                                security_group_id)[0]
+    proxy_server.wait_until_running()
+    proxy_server = ec2_resource.Instance(proxy_server.id)
+    instances.append(proxy_server)
+
     cluster_slaves = []
     slave_nodes = create_instances(ec2_resource, instance_ami, "t2.micro", key_pair["KeyName"], "slave_node", subnets[0], 3,
                                 security_group_id)
@@ -120,6 +126,20 @@ try:
     for connection in slave_connections:
         close_connection(connection)
 
+    proxy_connection = instance_connection(proxy_server.public_ip_address, key_material)
+    folder_path = os.path.abspath("proxy")
+    files = [
+        os.path.join(folder_path, "main.py"),
+        os.path.join(folder_path, "setup.sh"),
+        os.path.join(folder_path, "dns.json"),
+        os.path.join(folder_path, "key.pem")
+    ]
+    transfer_file(proxy_connection, files)
+    commands= [
+        "chmod 777 setup.sh",
+        "./setup.sh",
+    ]
+    run_commands(proxy_connection, commands)
 
 
 
