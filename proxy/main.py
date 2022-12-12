@@ -22,8 +22,7 @@ def execute_command(command:str, cluster_dns_object, key):
 
 
 def direct_hit(command, master_dns, key):
-    tunnel = create_ssh_tunnel(master_dns, master_dns, key)
-    send_command(command, tunnel)
+    send_command(master_dns,command)
 
 
 def create_ssh_tunnel(data_node_dns, master_node_dns, key):
@@ -37,10 +36,17 @@ def create_ssh_tunnel(data_node_dns, master_node_dns, key):
     return tunnel
 
 
-def send_command(command, tunnel):
-    connection =connection = pymysql.connect(host="127.0.0.1",
-                                                user="testuser", password="t3*5t",
-                                                db = 'sakila', port=tunnel.local_bind_port, autocommit=True)
+def send_command(host, command, tunnel=None):
+    connection =None
+    if tunnel is not None:
+        connection = pymysql.connect(host=host,
+                                    user="testuser", password="t3*5t",
+                                    db = 'sakila', port=tunnel.local_bind_port)
+
+    else:
+        connection = pymysql.connect(host=host,
+                                    user="testuser", password="t3*5t",
+                                    db = 'sakila', autocommit=True)
     
     cursor = connection.cursor()
     cursor.execute(command)
@@ -55,7 +61,7 @@ def random_hit(command, cluster_dns_object, key):
     number = random.randint(0,2)
     print("executting random hit with dns: {}".format(data_nodes_dns[number]))
     tunnel = create_ssh_tunnel(data_nodes_dns[number],cluster_dns_object["master_dns"], key)
-    send_command(command,tunnel)    
+    send_command("127.0.0.1",command, tunnel=tunnel)    
 
 
 def custom_hit(command, cluster_dns_obejct, key):
@@ -77,7 +83,7 @@ def custom_hit(command, cluster_dns_obejct, key):
     
     print("executing custom hit with dns: {}".format(chosen_data_node_dns))
     tunnel = create_ssh_tunnel(chosen_data_node_dns, cluster_dns_obejct["master_dns"], key)
-    send_command(command,tunnel)
+    send_command("127.0.0.1", command, tunnel=tunnel)
 
 
 

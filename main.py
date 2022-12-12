@@ -141,13 +141,11 @@ try:
     ]
     run_commands(proxy_connection, commands)
 
+    generate_ids_file(instances, security_group_id)
 
 
 except Exception as e:
-    print(e)
-
-finally:
-    """
+    print("Encountered error {} and deleting instances".format(e))
     if len(instances) > 0:
         for instance in instances:
             instance.terminate()
@@ -155,4 +153,3 @@ finally:
 
     ec2_client.delete_key_pair(KeyName="projectKey")
     delete_security_group(ec2_client, security_group_id)
-    """

@@ -19,6 +19,18 @@ def generate_pem_file(key):
     with open(path_file, "w") as output:
         output.write(key)
 
+def generate_ids_file(instances, security_group_id):
+    ids = []
+    for instance in instances:
+        ids.append(instance.id)
+    
+    dictionary = {
+        "Instances_ID": ids,
+        "security_group_id": security_group_id
+    }
+    file_name = "ids.json"
+    with open(file_name, "w") as file:
+        json.dump(dictionary, file)
 
 if __name__ == "__main__":
     generate_dns_file("ip-172-31-90-227.ec2.internal", "ip-172-31-81-129.ec2.internal", "ip-172-31-93-215.ec2.internal", "ip-172-31-84-174.ec2.internal")
