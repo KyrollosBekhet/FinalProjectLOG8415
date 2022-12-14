@@ -20,7 +20,6 @@ for sn in sn_all['Subnets']:
         subnets.append(sn['SubnetId'])
 
 instance_ami = 'ami-08c40ec9ead489470'
-#key_pair = ec2_client.describe_key_pairs()['KeyPairs'][0]
 key_pair = create_key_pair(ec2_client, "projectKey")
 key_material = key_pair["KeyMaterial"]
 generate_pem_file(key_material)
@@ -30,7 +29,7 @@ instances = []
 try:
     folder_path = os.path.abspath("bash_scripts")
     
-    # do the steps for the standalone version
+    # Standalone instance prepration
     instance = create_instances(ec2_resource, instance_ami, "t2.micro", key_pair["KeyName"], "standalone_instance", subnets[0], 1,
                                 security_group_id)[0]
     instance.wait_until_running()
@@ -111,6 +110,7 @@ try:
         "./clusterCommonSteps.sh",
         "sudo /opt/mysqlcluster/home/mysqlc/bin/ndbd -c {}:1186".format(master_node_instance.private_dns_name)
     ]
+    # wait 60 seconds to let the mysql server start on the management node
     time.sleep(60)
     for connection in slave_connections:
         transfer_file(connection, files)
@@ -126,6 +126,7 @@ try:
     for connection in slave_connections:
         close_connection(connection)
 
+    # automatically prepare and install dependencies on the proxy server instance
     proxy_connection = instance_connection(proxy_server.public_ip_address, key_material)
     folder_path = os.path.abspath("proxy")
     files = [

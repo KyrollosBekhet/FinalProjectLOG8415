@@ -7,6 +7,7 @@ def create_security_group(ec2, vpc_id):
     This method creates the security group and adds the inbound and outbound rules necessary.
 
     :param ec2: The ec2 resource that we can get from boto3
+    :param vpc_id: The id of the virtual private network
     :return: {
             "IpPermissionsEgress": [
                 {
@@ -28,8 +29,8 @@ def create_security_group(ec2, vpc_id):
         }
     """
     security_group = ec2.create_security_group(
-        Description="security group TP1",
-        GroupName="TP1automaticSG",
+        Description="security group final project",
+        GroupName="FPautomaticSG",
         VpcId=vpc_id
     )
 
@@ -40,10 +41,10 @@ def create_security_group(ec2, vpc_id):
 
 
 def add_inbound_rules(ec2, security_group_id):
-    # ingress_rules
     """
     The rules accepted from incoming traffic will correspond to SSH, HTTP and HTTPS
-    :param security_group: The security group to which we want to add rules
+    :param security_group_id: The security group to which we want to add rules
+    :param ec2: The ec2 resource that we can get from boto3
     :return: nothing
     """
     ip_permission = [{
@@ -87,11 +88,11 @@ def add_inbound_rules(ec2, security_group_id):
 
 
 def add_outbound_rules(ec2, security_group_id):
-    # egress_rules
     """
     The rules accepted to go to the outside traffic will be HTTP and HTTPS
     AWS adds also a default all traffic rule
-    :param security_group: The security group to which we want to add rules
+    :param security_group_id: The security group to which we want to add rules
+    :param ec2: The ec2 resource that we can get from boto3
     :return: nothing
     """
     ip_permission = [{
@@ -114,7 +115,8 @@ def add_outbound_rules(ec2, security_group_id):
 def delete_security_group(ec2, security_group_id):
     """
     This function remove a security group
-    :security_group_id : The security group to delete
+    :param security_group_id : The security group to delete
+    :param ec2: The ec2 resource that we can get from boto3
     """
     ec2.delete_security_group(GroupId=security_group_id)
 

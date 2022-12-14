@@ -17,6 +17,13 @@ import os
 
 
 def write_file_content(mgmt_node_hs, first_slave_hs, second_slave_hs, third_slave_hs):
+    """
+    Description: Writes config.ini used in cluster setup
+    :param mgmt_node_hs: The host name of the master node where the mysql database is installed
+    :param first_slave_hs: The hostname of the first data node
+    :param second_slave_hs: The hostname of the second data node
+    :param third_slave_hs: The hostname of the third data node
+    """
     ret = "[ndb_mgmd]\n" +\
           "hostname={}\n".format(mgmt_node_hs) +\
           "datadir=/opt/mysqlcluster/deploy/ndb_data\n" +\
@@ -45,6 +52,8 @@ def write_file_content(mgmt_node_hs, first_slave_hs, second_slave_hs, third_slav
     f.write(ret)
     f.close()
 
-
+"""
+Driver to test the write function
+"""
 if __name__ == "__main__":
     write_file_content("ip-172-31-88-28.ec2.internal", "ip-172-31-91-195.ec2.internal", "ip-172-31-91-195.ec2.internal", "ip-172-31-91-195.ec2.internal")

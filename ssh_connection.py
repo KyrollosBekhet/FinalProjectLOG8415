@@ -39,8 +39,10 @@ def instance_connection(instance_ip, key_material):
 
 def transfer_file(ssh_connection, files):
     """
-    Initializes a SCP connection using a SSH connection and tranfert the file to the instance connected 
+    Initializes a SCP connection using a SSH connection and transfer the file to the instance connected
     to the session.
+    :param ssh_connection: SSH connection established with the instance
+    :param files: The files to trnasfer
     """
     scp_connection = SCPClient(ssh_connection.get_transport())
     for file in files:
@@ -48,6 +50,11 @@ def transfer_file(ssh_connection, files):
 
 
 def get_file_from_remote(ssh_connection, filename):
+    """
+    Gets a file from a remote instance
+    :param ssh_connection: The ssh connection established with the instance
+    :param filename: The name of the file to fetch from the instance
+    """
     ftp_client = ssh_connection.open_sftp()
     ftp_client.get("/home/ubuntu/{}".format(filename), os.path.join(os.path.curdir, filename))
 
