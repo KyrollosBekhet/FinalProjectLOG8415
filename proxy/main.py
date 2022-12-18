@@ -5,6 +5,7 @@ from sshtunnel import SSHTunnelForwarder
 import random
 import subprocess
 import re
+import sys
 
 def execute_command(command:str, cluster_dns_object, key):
     """
@@ -72,6 +73,7 @@ def send_command(host, command, tunnel=None):
     cursor.execute(command)
     output = cursor.fetchall()
     print(output)
+    connection.close()
 
 
 def random_hit(command, cluster_dns_object, key):
@@ -87,7 +89,9 @@ def random_hit(command, cluster_dns_object, key):
     number = random.randint(0,2)
     print("executting random hit with dns: {}".format(data_nodes_dns[number]))
     tunnel = create_ssh_tunnel(data_nodes_dns[number],cluster_dns_object["master_dns"], key)
-    send_command("127.0.0.1",command, tunnel=tunnel)    
+    send_command("127.0.0.1",command, tunnel=tunnel)
+    tunnel.stop()
+    tunnel.close()    
 
 
 def custom_hit(command, cluster_dns_obejct, key):
@@ -116,7 +120,8 @@ def custom_hit(command, cluster_dns_obejct, key):
     print("executing custom hit with dns: {}".format(chosen_data_node_dns))
     tunnel = create_ssh_tunnel(chosen_data_node_dns, cluster_dns_obejct["master_dns"], key)
     send_command("127.0.0.1", command, tunnel=tunnel)
-
+    tunnel.stop()
+    tunnel.close()
 
 
 
@@ -143,11 +148,9 @@ if __name__ == "__main__":
 
     pKey = paramiko.RSAKey.from_private_key_file("key.pem")
 
-    commands = [
-        "SELECT * FROM actor",
-        "INSERT INTO actor VALUES (201, 'Kevin', 'Hart', '2006-02-15 04:34:33')",
-        "SELECT * FROM actor"
-    ]
+    # Read the given commands in the argument list
+    commands = sys.argv[1:]
+
     for command in commands:
         execute_command(command, cluster_dns_object, pKey)
 
