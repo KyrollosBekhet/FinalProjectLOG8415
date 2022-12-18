@@ -60,14 +60,14 @@ def do_terminate(ec2_resource, instance_id):
     instance.wait_until_terminated()
 
 
-def terminate_instances(ec2_resource, instances_ids):
+def terminate_instances(ec2_resource, instances):
     """
     This function terminates multiple instances using multi-threading.
-    :param instances_ids: A list of instance id to terminate
+    :param instances_ids: A list of instances to terminate
     :param ec2_resource: The ec2 resource used to terminate the instances
     """
     threads = []
-    for instance in instances_ids:
+    for instance in instances:
         thread = Thread(target=do_terminate, args=[ec2_resource, instance['Id']])
         thread.start()
         threads.append(thread)
