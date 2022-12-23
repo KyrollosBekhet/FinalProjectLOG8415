@@ -27,7 +27,7 @@ ec2_client = session.client('ec2')
 ec2_resource = session.resource('ec2')
 with open("ids.json") as file:
     ids_object = json.load(file)
-    terminate_instances(ec2_resource,["Instances_ID"])
+    terminate_instances(ec2_resource,ids_object["Instances_ID"])
 
     ec2_client.delete_key_pair(KeyName="projectKey")
     delete_security_group(ec2_client, ids_object["security_group_id"])
